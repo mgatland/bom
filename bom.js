@@ -7,12 +7,37 @@ const messageAlertCountEl = $('.bom-message-alert-count')
 const messageListEl = $('.bom-message-list')
 const accountListEl = $('.bom-account-list')
 const deleteMessagesEl = $('.bom-delete-messages-button')
+const toastEl = $('.bom-toasts')
 
 const client = {}
 client.refresh = function () {
   updateMessages()
   updateAccounts()
 }
+
+let nextToastId = 0
+client.toast = function (message) {
+  let newNode = document.createRange().createContextualFragment(
+  `<div data-toastid=${nextToastId++} class="border-2 p-2 bg-base-100 rounded-md shadow-xl transition-opacity	duration-500">
+  ${message}
+  <i class="fa-solid fa-xmark fa-xl ml-6 bom-dismiss-toast"></i>
+  </div>`)
+
+  toastEl.appendChild(newNode)
+
+  function hideLater(node) {
+    setTimeout(() => {node.classList.add('opacity-0')}, 5000)
+    setTimeout(x => node.remove(), 5000 + 750)
+  }
+  hideLater(toastEl.lastElementChild)
+}
+
+toastEl.addEventListener('click', e => {
+  if (e.target.classList.contains('bom-dismiss-toast')) {
+    e.target.parentElement.classList.add('opacity-0')
+    setTimeout(x => e.target.parentElement.remove(), 750)
+  }
+})
 
 $('.bom-alert-button').addEventListener('click', function(e) {
   showPage(messagesPageEl)

@@ -2,9 +2,15 @@ todo:
 
 [x] free gift button, manage state - unused, loading, used
 [ ] a toast pops up when your balance changes
+    fa-xmark in the corner
 [ ] your bank accounts have a transaction history 
+
+
+[ ] changelog - we fixed an issue where some users missed out on their welcome gift.
 
 [ ] the game can be saved in local storage 
 [ ] there's a 'sign up page' at the beginning 
+
+and then... what is the actual game here?
 
 - replace fa-envelope with fa-bell to use bell icon for notifications

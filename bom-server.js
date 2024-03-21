@@ -9,6 +9,10 @@ const server = {}
 
   const freeGiftText = `Collect welcome gift`
 
+  function cash(num) {
+    return Number(num).toFixed(2)
+  }
+
   function setupNewUser() {
     user.messages = []
     user.unclaimedGifts = []
@@ -81,6 +85,17 @@ const server = {}
     user.events[frame].push(event)
   }
 
+  function giveMoney(amount) {
+    const account = user.accounts[0]
+    account.balance += amount
+    toast(`Your ${account.name} account balance is now $${cash(account.balance)}`)
+  }
+
+  function toast(message) {
+    //toasts are transient and not persisted
+    client.toast(message)
+  }
+
   function tick() {
     state.frame = (state.frame + 1 % (60 * 60))
     if (user.messages.length == 0) {
@@ -93,7 +108,7 @@ const server = {}
     }
     for (const event of (user.events[state.frame] || [])) {
       if (event.type === 'freeGiftRecieved') {
-        user.accounts[0].balance += 100
+        giveMoney(100)
         const message = user.messages.find(x => x.id = 'free-gift-' + event.id)
         if (message) {
           message.action.text =

@@ -1,0 +1,10 @@
+todo: 
+
+[x] free gift button, manage state - unused, loading, used
+[ ] a toast pops up when your balance changes
+[ ] your bank accounts have a transaction history 
+
+[ ] the game can be saved in local storage 
+[ ] there's a 'sign up page' at the beginning 
+
+- replace fa-envelope with fa-bell to use bell icon for notifications

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="./output.css">
+  <!--<link href="/fontawesome/css/fontawesome.css" rel="stylesheet" />
+    <link href="/fontawesome/css/brands.css" rel="stylesheet" />
+    <link href="/fontawesome/css/solid.css" rel="stylesheet" />-->
+    <link href="/fontawesome/css/all.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/timeago.js/2.0.2/timeago.min.js"></script>
+  </head>
+  <body>
+    <div class="max-w-screen-md	mx-auto">
+      <!-- nav bar-->
+      <div class="navbar bg-base-100 sticky top-0 z-30 flex border-b-2">
+        <div class="flex-1">
+          <a class="btn btn-ghost text-xl bom-home-button"><i class="fa-solid fa-person-through-window fa-xl" style="Margin-top: 7px;"></i>Bank of Matthew</a>
+        </div>
+        <div tabindex="0" role="button" class="btn btn-ghost btn-circle bom-alert-button">
+          <div class="indicator">
+            <i class="fa-solid fa-envelope fa-xl"></i>
+            <span class="badge badge-sm indicator-item indicator-top badge-error bom-message-alert bom-message-alert-count" style="--tw-translate-y:-120%">1</span>
+          </div>
+        </div>
+      </div>
+      <!-- accounts summary -->
+      <div class="bom-page-accounts">
+        <h1 class="text-xl font-semibold py-8 px-4 border-b-2">Your Accounts</h1>
+        <div class="bom-account-list">
+          <div class="flex flex-row justify-between border-b-2 py-4">
+            <div class="mx-4 pl-4 border-l-8 border-primary h-10 leading-10">Everyday</div>
+            <div class="px-4 h-10 leading-10 hori">$0.00</div>
+          </div>
+          <div class="flex flex-row justify-between border-b-2 py-4">
+            <div class="mx-4 pl-4 border-l-8 border-secondary h-10 leading-10">Savings</div>
+            <div class="px-4 h-10 leading-10 hori">$0.00</div>
+          </div>
+        </div>
+      </div>
+      <!-- message log -->
+      <!-- ASB style: you can't click into individual messages. Consider it? -->
+      <div class="bom-page-messages">
+        <h1 class="text-xl font-semibold py-8 px-4 border-b-2">Messages</h1>
+        <div class="bom-message-list">
+          <!--messages-->
+        </div>
+        <div class="mx-4">
+          <div class="btn bom-delete-messages-button">Delete all messages</div>
+        </div>
+      </div>
+    </div>
+    <script src="./bom-server.js"></script>
+    <script src="./bom.js"></script>
+  </body>
+  </html>
+  

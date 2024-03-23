@@ -1,16 +1,124 @@
 todo: 
 
+Currently you can earn 1100 COM per minute from welcome gifts.
+
 [x] free gift button, manage state - unused, loading, used
-[ ] a toast pops up when your balance changes
-    fa-xmark in the corner
+[x] a toast pops up when your balance changes
+[x] fa-xmark in the corner
+
+2024-03-22
+OK, next phase:
+[x] you can create a 'term investment account'
+[x] there's a new page to do this
+[x] you need a minimum of 500 COM to open a term investment account
+[...] it appears in the accounts list with a progress bar and the 'end of term' date
+[...] when the timer completes the interest goes to your cheque account
+
+[x] the create account form
+[x] validation when trying to submit the form
+[x] on failure, send a failure toast? (hacky option instead of doing real validation)
+[x] on success, send a toast and go to the accounts page
+[x] obviously, create the actual new account
+
+Next phase:
+
+In another game the first investment takes 150 seconds to break even.
+https://game.giantshaft.com/#/business
+
+2024-03-23
+I am really troubled by the savings account. If you earn 1% interest per second, you break even after 1:40,
+and have doubled your money after 3:20, and... it just goes up exponentially from there.
+
+I think this is because I didn't really want BOM to be an incremental game - not really.
+
+And so it feels bad to me making COM so quickly become so worthless. If this is how you earn COM, it cannot meaningfully be used as a currency for anything.
+
+But this fears are a bit out of scope, are they not? You can't spend the money on anything yet anyway and the game is so far from being there... it's probably best to just go for it and not hesitate or get hung up on the economy.
+
+Maybe I could pause and design a 'savings account' that works better, has exponentially increasing cost - you buy shares that generate revenue perhaps? but, eh, I need to just keep going I think.
+
+Next up:
+[x] Term Investments display nicely in the accounts list
+    - end date
+    - interest per second 
+    - some kind of animation to show the constant interest
+[x] feed extra income into the main account 
+
+Refreshing everything is annoying. This is the point where I wish I had used react or a similar UI framework.
+I need to do a selective refresh of only what changed.
+Of course I'm not going to implement a virtual DOM now with only 1.5 days left. So I guess it's going to be bespoke refresh modes for different types of changes :/
+
+
+[ ] add energy limits... limits how much you can transfer per minute.
+    Error when a transfer fails.
+
+
+- shower
+- get dressed 
+- energy limits!
+- 
+
+
+[ ] add transaction history... and somehow manage the noise of too many interest payments
+
+[ ] When your total balance gets too high you get a message about tax.
+    Tax is going to be our way of having exponentially increasing costs?
+
+
+[ ] you can open a savings account
+[ ] you can transfer money between your accounts 
 [ ] your bank accounts have a transaction history 
 
-
 [ ] changelog - we fixed an issue where some users missed out on their welcome gift.
-
-[ ] the game can be saved in local storage 
+[ ] the game can be saved in local storage and restored
 [ ] there's a 'sign up page' at the beginning 
+
+[ ] maybe the 'real currency' is having messages in your inbox.
+[ ] restyle all buttons to be sharp rectangles with crisp outlines like Westpac has
 
 and then... what is the actual game here?
 
 - replace fa-envelope with fa-bell to use bell icon for notifications
+
+ideas:
+
+new:
+
+buy funds and securities 
+put money in savings accounts or term investments
+
+
+
+from google keep:
+if you report a bug you get put on hold. The hold waiting position number gives you a secret code that's new every day 
+Once you make too much money you get contacted by the bank about investing, or maybe questioned
+
+Should children be allowed cookies? Only when neccessary | yes 
+
+from gmail:
+
+I’m launching bank of Matthew,a new financial system. It’s like Bitcoin except
+1. It is highly unreliable and insecure
+2. It only works if you trust me, Matthew Gatland 
+3. It has a much smaller environmental impact. The energy required to produce one Bitcoin could run bank of Matthew for many years.
+
+lets you buy domain names in the Domain Registry of Matthew
+
+(some weird idea about having contracts and lawsuits in BOM?!)
+
+Give me the answer to todays wordle
+
+Play bad games to earn Matthewcoin. Then spend matthewcoin to play better games for free!
+
+"I really really should make Bank of Matthew  "
+
+Pick flowers in a unicode garden:
+🌺🌺🌺🌺🌷🌺🌺🌺🌺🌺🌺
+🌺🌺🌺🌺🌺🌺🌺🌺🌺🌺🌺
+🌺🌺🌺🌺🌺🌺🌺🌺🌺🌺🌺
+
+In Bank of Matthew you can buy ebooks and there’s chapters of my stories for sale  
+
+Bank of Matthew daily puzzle like NYT Connections. Or the real puzzle is finding tweets where people posted the answers to Connections
+
+could BOM be an incremental game?

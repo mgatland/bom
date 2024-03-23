@@ -1,7 +1,8 @@
-const $ = document.querySelector.bind(document)
+import mCreateAccountPage from "./bom-create-account.js"
 
-const accountsPageEl = $('.bom-page-accounts')
-const messagesPageEl = $('.bom-page-messages')
+const $ = document.querySelector.bind(document)
+const camelToDashCase = str => str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+
 const messageAlertEl = $('.bom-message-alert')
 const messageAlertCountEl = $('.bom-message-alert-count')
 const messageListEl = $('.bom-message-list')
@@ -9,18 +10,35 @@ const accountListEl = $('.bom-account-list')
 const deleteMessagesEl = $('.bom-delete-messages-button')
 const toastEl = $('.bom-toasts')
 
-const client = {}
-client.refresh = function () {
-  updateMessages()
-  updateAccounts()
+const bankPages = []
+function addBankPage(name) {
+  bankPages[name] = $('.bom-page-' + camelToDashCase(name))
 }
+['createAccount', 'accounts', 'messages'].map(addBankPage)
+
+const client = {}
+client.refresh = function (parts) {
+  if (!parts) {
+    updateMessages()
+    updateAccounts()
+    return
+  }
+  if (parts.includes('messages')) {
+    updateMessages()
+  }
+  if (parts.includes('accountBalances')) {
+    updateAccountBalances()
+  }
+}
+
+client.showAccounts = () => showPage(bankPages.accounts)
 
 let nextToastId = 0
 client.toast = function (message) {
   let newNode = document.createRange().createContextualFragment(
   `<div data-toastid=${nextToastId++} class="border-2 p-2 bg-base-100 rounded-md shadow-xl transition-opacity	duration-500">
   ${message}
-  <i class="fa-solid fa-xmark fa-xl ml-6 bom-dismiss-toast"></i>
+  <i class="fa-solid fa-xmark fa-xl ml-6 cursor-pointer bom-dismiss-toast"></i>
   </div>`)
 
   toastEl.appendChild(newNode)
@@ -40,11 +58,16 @@ toastEl.addEventListener('click', e => {
 })
 
 $('.bom-alert-button').addEventListener('click', function(e) {
-  showPage(messagesPageEl)
+  showPage(bankPages.messages)
 })
 
 $('.bom-home-button').addEventListener('click', function(e) {
-  showPage(accountsPageEl)
+  showPage(bankPages.accounts)
+})
+
+$('.bom-create-account-button').addEventListener('click', function (e) {
+  mCreateAccountPage.refresh()
+  showPage(bankPages.createAccount)
 })
 
 messageListEl.addEventListener('click', function(e) {
@@ -64,22 +87,21 @@ function display(el, displayStatus) {
   el.classList.toggle('hidden', !displayStatus)
 }
 
-function showPage(page) {
+// hide other pages and show the given page
+function showPage(newPage) {
   client.refresh()
-  display(accountsPageEl, accountsPageEl === page)
-  display(messagesPageEl, messagesPageEl === page)
+  const showPage = aPage => display(aPage, aPage == newPage)
+  Object.entries(bankPages).forEach(([, value]) => showPage(value))
 }
 
 function updateMessages() {
   const messages = server.getMessages()
   const alertCount = server.getAlertCount()
-  log(messages, alertCount)
   display(messageAlertEl, alertCount > 0)
   messageAlertCountEl.innerHTML = alertCount
   let messagesHtml = ''
   let timeAgo = new timeago()
   for (const message of messages) {
-    log(message.title)
     messagesHtml += `
   <div class="border-b-2 py-4 mb-4">
     <div class="mx-4 mb-3 text-slate-400">${capitalizeFirstLetter(timeAgo.format(message.date))}</div>
@@ -98,17 +120,53 @@ function updateMessages() {
   messageListEl.innerHTML = messagesHtml
 }
 
+function updateHtml(el, newHTML) {
+  if (el.innerHTML != newHTML) {
+    el.innerHTML = newHTML
+  }
+}
+
+function updateAccountBalances() {
+  //super hacks. Lots of duplicate and strongly coupled code with method below.
+  const accounts = server.getAccounts()
+  let n = 0
+  for (const account of accounts) {
+      updateHtml(accountListEl.querySelector('.bom-acc-bal-' + n), `$${cash(account.balance)}`)
+    if (account.type === 'term investment') {
+      updateHtml(accountListEl.querySelector('.bom-acc-int-' + n), `Interest: $${cash(account.balance * account.interestRate)}`)
+    }
+    n++
+  }
+}
+
 function updateAccounts() {
   const accounts = server.getAccounts()
-  log(accounts)
   let accountsHtml = ''
+  let n = 0
   for (const account of accounts) {
-    accountsHtml += `
-    <div class="flex flex-row justify-between border-b-2 py-4">
-      <div class="mx-4 pl-4 border-l-8 border-primary h-10 leading-10">${account.name}</div>
-      <div class="px-4 h-10 leading-10 hori">$${cash(account.balance)}</div>
-    </div>
-    `
+    if (account.type === 'term investment') {
+      accountsHtml += `
+      <div class="flex flex-row border-b-2 py-4 items-center">
+        <div class="ml-4 pl-4 border-l-8 border-secondary h-10 leading-10 my-auto"></div>
+        <div class="pr-4 flex flex-col">
+          <div class="">${account.name}</div>
+          <div class="text-slate-400">Locked until ${account.endDate.toLocaleDateString("en-NZ")}</div>
+        </div>
+        <div class="flex-1"></div>
+        <div class="pl-4 pr-2 bom-acc-int-${n}">Interest: $${cash(account.balance * account.interestRate)}</div>
+        <div class="pr-4 loading loading-ring loading-md"></div>
+        <div class="px-4 text-slate-400 bom-acc-bal-${n}">$${cash(account.balance)}</div>
+      </div>
+      `
+    } else {
+      accountsHtml += `
+      <div class="flex flex-row justify-between border-b-2 py-4">
+        <div class="mx-4 pl-4 border-l-8 border-primary h-10 leading-10">${account.name}</div>
+        <div class="px-4 h-10 leading-10 hori bom-acc-bal-${n}">$${cash(account.balance)}</div>
+      </div>
+      `
+    }
+    n++
   }
   accountListEl.innerHTML = accountsHtml;
 }
@@ -126,4 +184,5 @@ function capitalizeFirstLetter(string) {
 }
 
 server.start(client)
-showPage(accountsPageEl)
+mCreateAccountPage.setup(bankPages.createAccount, server)
+showPage(bankPages.accounts)

@@ -48,36 +48,31 @@ Refreshing everything is annoying. This is the point where I wish I had used rea
 I need to do a selective refresh of only what changed.
 Of course I'm not going to implement a virtual DOM now with only 1.5 days left. So I guess it's going to be bespoke refresh modes for different types of changes :/
 
+[x] make fewer redundant DOM refreshes every second 
+
+1.5 days to go. Let's go!!!
+
+Future goals:
+[ ] let players transfer money between accounts. It's not really useful but important to the bank fantasy.
+[ ] the game can be saved in local storage and restored
+[ ] there's a 'sign up page' at the beginning that sets the scene.
 
 [ ] add energy limits... limits how much you can transfer per minute.
     Error when a transfer fails.
+    This sets up the 'part 2' of the game. Managing energy.
 
-
-- shower
-- get dressed 
-- energy limits!
-- 
-
-
+Nice-to-have:
 [ ] add transaction history... and somehow manage the noise of too many interest payments
 
+Abandoned:
 [ ] When your total balance gets too high you get a message about tax.
     Tax is going to be our way of having exponentially increasing costs?
-
-
-[ ] you can open a savings account
-[ ] you can transfer money between your accounts 
+[ ] the animation in a Term Investment should be 1 second long, not 1.8 seconds long, so it syncs with actual payments.
 [ ] your bank accounts have a transaction history 
-
 [ ] changelog - we fixed an issue where some users missed out on their welcome gift.
-[ ] the game can be saved in local storage and restored
-[ ] there's a 'sign up page' at the beginning 
-
 [ ] maybe the 'real currency' is having messages in your inbox.
 [ ] restyle all buttons to be sharp rectangles with crisp outlines like Westpac has
-
 and then... what is the actual game here?
-
 - replace fa-envelope with fa-bell to use bell icon for notifications
 
 ideas:
@@ -86,7 +81,6 @@ new:
 
 buy funds and securities 
 put money in savings accounts or term investments
-
 
 
 from google keep:

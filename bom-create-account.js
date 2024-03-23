@@ -16,7 +16,9 @@ const termInvestmentAccountDesc = `
 
 mCreateAccountPage.setup = function (basePage, server) { 
   basePage.innerHTML = `
-  <h1 class="text-xl font-semibold py-8 px-4 border-b-2">Create new Account</h1>
+  <h1 class="text-xl font-semibold py-8 px-4 border-b-2">
+  <i class="fa-solid fa-chevron-left -m-4 mr-0 p-4 bom-show-accounts cursor-pointer"></i>
+  Create new Account</h1>
   <div class="mx-4 mb-3 mt-3">Account type:</div>
   <div class="mx-4 mb-3 menu p-0">
     <input class="btn bom-create-account-0" type="radio" name="options" aria-label="Everyday account" value="everyday" checked>

@@ -53,7 +53,22 @@ Of course I'm not going to implement a virtual DOM now with only 1.5 days left. 
 1.5 days to go. Let's go!!!
 
 Future goals:
+[x] add transaction history to every account. It's part of the fantasy even if not useful.
+[x] add a link to view transactions for each account
+[x] add a back button from transaction history to accounts list
+[x] add 'back' button breadcrumb to 'Create New Account' page
+
+[x] create account specific view page with
+    [x] back breadcrumb to accounts list
+    [x] list of all transactions
+    [x] soon: collapse interest transactions into groups every minute or so
+    [ ] summary of account details at the top.
+
 [ ] let players transfer money between accounts. It's not really useful but important to the bank fantasy.
+    - new 'transfer' page accessed from account specific page
+    - could also have its own dedicated link
+    - choose account to transfer from, account to transfer to, amount.
+    - error handling and make it work.
 [ ] the game can be saved in local storage and restored
 [ ] there's a 'sign up page' at the beginning that sets the scene.
 

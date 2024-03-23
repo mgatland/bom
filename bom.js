@@ -1,4 +1,5 @@
 import mCreateAccountPage from "./bom-create-account.js"
+import mAccountPage from "./bom-account.js"
 
 const $ = document.querySelector.bind(document)
 const camelToDashCase = str => str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
@@ -14,7 +15,7 @@ const bankPages = []
 function addBankPage(name) {
   bankPages[name] = $('.bom-page-' + camelToDashCase(name))
 }
-['createAccount', 'accounts', 'messages'].map(addBankPage)
+['createAccount', 'accounts', 'messages', 'account'].map(addBankPage)
 
 const client = {}
 client.refresh = function (parts) {
@@ -45,15 +46,21 @@ client.toast = function (message) {
 
   function hideLater(node) {
     setTimeout(() => {node.classList.add('opacity-0')}, 5000)
-    setTimeout(x => node.remove(), 5000 + 750)
+    setTimeout(x => node.remove(), 5000 + 500)
   }
   hideLater(toastEl.lastElementChild)
 }
 
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('bom-show-accounts')) {
+    showPage(bankPages.accounts)
+  }
+})
+
 toastEl.addEventListener('click', e => {
   if (e.target.classList.contains('bom-dismiss-toast')) {
     e.target.parentElement.classList.add('opacity-0')
-    setTimeout(x => e.target.parentElement.remove(), 750)
+    setTimeout(x => e.target.parentElement.remove(), 500)
   }
 })
 
@@ -70,11 +77,16 @@ $('.bom-create-account-button').addEventListener('click', function (e) {
   showPage(bankPages.createAccount)
 })
 
+accountListEl.addEventListener('click', function(e) {
+  const viewAccountEl = e.target.closest('.bom-view-account')
+  if (viewAccountEl) {
+    mAccountPage.show(parseInt(viewAccountEl.dataset.accountNum))
+    showPage(bankPages.account)
+  }
+})
+
 messageListEl.addEventListener('click', function(e) {
   if (e.target.classList.contains('btn') && e.target.dataset.action === 'freeGift') {
-    e.target.innerHTML =
-    `<span style='color:rgba(0,0,0,0);'>${e.target.innerHTML}</span>`  
-    +'<span class="loading loading-spinner absolute"></span>'
     server.userAction(e.target.dataset.action, e.target.dataset.code)
   }
 })
@@ -146,10 +158,10 @@ function updateAccounts() {
   for (const account of accounts) {
     if (account.type === 'term investment') {
       accountsHtml += `
-      <div class="flex flex-row border-b-2 py-4 items-center">
+      <div class="flex flex-row border-b-2 py-4 items-center bom-view-account cursor-pointer" data-account-num="${n}">
         <div class="ml-4 pl-4 border-l-8 border-secondary h-10 leading-10 my-auto"></div>
         <div class="pr-4 flex flex-col">
-          <div class="">${account.name}</div>
+          <div>${account.name}</div>
           <div class="text-slate-400">Locked until ${account.endDate.toLocaleDateString("en-NZ")}</div>
         </div>
         <div class="flex-1"></div>
@@ -160,7 +172,7 @@ function updateAccounts() {
       `
     } else {
       accountsHtml += `
-      <div class="flex flex-row justify-between border-b-2 py-4">
+      <div class="flex flex-row justify-between border-b-2 py-4 bom-view-account cursor-pointer" data-account-num="${n}">
         <div class="mx-4 pl-4 border-l-8 border-primary h-10 leading-10">${account.name}</div>
         <div class="px-4 h-10 leading-10 hori bom-acc-bal-${n}">$${cash(account.balance)}</div>
       </div>
@@ -185,4 +197,5 @@ function capitalizeFirstLetter(string) {
 
 server.start(client)
 mCreateAccountPage.setup(bankPages.createAccount, server)
+mAccountPage.setup(bankPages.account, server)
 showPage(bankPages.accounts)

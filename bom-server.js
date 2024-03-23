@@ -1,6 +1,6 @@
 const user = {}
 const state = {user, frame:0}
-window.cheats = false
+window.cheats = true
 
 // API
 const server = {}
@@ -25,10 +25,13 @@ const server = {}
       balance: 0,
       txns: []
     }
+    transaction(user.accounts[0], 0, 'Opening balance')
     user.emptyInboxTime = 4 // hack to more quickly trigger the welcome email
     user.events = {}
     if (window.cheats) {
       giveMoney(300)
+      giveMoney(-20)
+      giveMoney(3)
       server.createAccount('term investment', 'Term Investment', 150, 0) 
     }
   }
@@ -93,9 +96,40 @@ const server = {}
     user.events[frame].push(event)
   }
 
+  function datesMatch(oldDate, newDate) {
+    const cleanOld = new Date(oldDate)
+    const cleanNew = new Date(newDate)
+    cleanOld.setSeconds(0)
+    cleanOld.setMilliseconds(0)
+    cleanNew.setSeconds(0)
+    cleanNew.setMilliseconds(0)
+    return cleanOld.getTime() === cleanNew.getTime()
+  }
+
+  function transaction(account, amount, message) {
+    account.balance += amount
+
+    // special handling for rapidly repeated payments
+    const date = new Date();
+    const lastTxn = account.txns.slice(-1)[0]
+    if (lastTxn && lastTxn.amount === amount && lastTxn.message === message && datesMatch(lastTxn.date, date)) {
+      lastTxn.date = date
+      lastTxn.multiplier = lastTxn.multiplier + 1 || 1 
+      return
+    }
+
+    account.txns.push({
+      amount: amount,
+      message: message,
+      balance: account.balance,
+      date: date
+      //multiplier
+    })
+  }
+
   function giveMoney(amount) {
     const account = user.accounts[0]
-    account.balance += amount
+    transaction(account, amount, 'BOM Welcome Gift')
     toast(`Your ${account.name} account balance is now $${cash(account.balance)}`)
   }
 
@@ -131,7 +165,8 @@ const server = {}
     }
     for (const account of user.accounts) {
       if (account.type === 'term investment') {
-        user.accounts[0].balance += account.interestRate * account.balance
+        const amount = Math.floor(100 * account.interestRate * account.balance) / 100
+        transaction(user.accounts[0], amount, 'Interest')
         dirty.push('accountBalances')
       }
     }
@@ -166,7 +201,7 @@ const server = {}
     const newAccount = {
       name: accountName,
       type: accountType,
-      balance: startBalance,
+      balance: 0,
       txns: []
     }
     if (newAccount.type === 'term investment') {
@@ -174,7 +209,8 @@ const server = {}
       newAccount.interestRate = 0.01
     }
     user.accounts.push(newAccount)
-    oldAccount.balance -= startBalance
+    transaction(oldAccount, -startBalance, 'Transfer to ' + accountName)
+    transaction(newAccount, startBalance, 'Opening balance')
     client.toast("New account created!")
     client.showAccounts()
   }

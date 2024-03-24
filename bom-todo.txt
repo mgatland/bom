@@ -62,7 +62,15 @@ Future goals:
     [x] back breadcrumb to accounts list
     [x] list of all transactions
     [x] soon: collapse interest transactions into groups every minute or so
-    [ ] summary of account details at the top.
+    [soon] summary of account details at the top.
+
+2024-03-24
+Final day!
+
+[x] Account pages have a summary of that account's details at the top.
+
+[ ] handle setInterval running less frequently in background tabs. Do a 'catch-up' process on the server.
+    have 'serverTime that increments by one second at a time.
 
 [ ] let players transfer money between accounts. It's not really useful but important to the bank fantasy.
     - new 'transfer' page accessed from account specific page
@@ -78,6 +86,7 @@ Future goals:
 
 Nice-to-have:
 [ ] add transaction history... and somehow manage the noise of too many interest payments
+[ ] look at ASB screenshots on my phone from 2024-03-24. Nicer transaction history.
 
 Abandoned:
 [ ] When your total balance gets too high you get a message about tax.

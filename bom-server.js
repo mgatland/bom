@@ -30,8 +30,6 @@ const server = {}
     user.events = {}
     if (window.cheats) {
       giveMoney(300)
-      giveMoney(-20)
-      giveMoney(3)
       server.createAccount('term investment', 'Term Investment', 150, 0) 
     }
   }
@@ -114,7 +112,7 @@ const server = {}
     const lastTxn = account.txns.slice(-1)[0]
     if (lastTxn && lastTxn.amount === amount && lastTxn.message === message && datesMatch(lastTxn.date, date)) {
       lastTxn.date = date
-      lastTxn.multiplier = lastTxn.multiplier + 1 || 1 
+      lastTxn.multiplier = lastTxn.multiplier + 1 || 2 
       return
     }
 

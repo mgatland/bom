@@ -23,10 +23,27 @@ mAccountPage.setup = function (basePage, server) {
   
   mAccountPage.show = function(accountNum) {
     const account = server.getAccounts()[accountNum]
+    const isTermInvestment = account.type === 'term investment'
+    const n = accountNum
     let html = `
-    <h1 class="text-xl font-semibold py-8 px-4 border-b-2"> 
-    <i class="fa-solid fa-chevron-left -m-4 mr-0 p-4 bom-show-accounts cursor-pointer"></i> ${account.name}
-    </h1>
+    <div class="py-8 px-4 border-b-2"> 
+      <div class="text-xl font-semibold flex flex-row items-center">
+        <i class="fa-solid fa-chevron-left -m-4 mr-0 p-4 bom-show-accounts cursor-pointer"></i>
+        <span> ${account.name}</span>
+        <div class="flex-1"></div>
+        <div class="px-4 bom-acc-bal-${n} ${isTermInvestment ? ' text-slate-400' : ''}">$${cash(account.balance)}</div>
+      </div>
+    `
+    if (account.type === 'term investment') {
+    html += `   <div class="flex flex-row ml-8">
+        <div class="text-slate-400">Locked until ${account.endDate.toLocaleDateString("en-NZ")}</div>
+        <div class="flex-1"></div>
+        <div class="pl-4 pr-4 bom-acc-int-${n}">Interest: $${cash(account.balance * account.interestRate)}</div>
+        <!--<div class="pr-4 mr-4 loading loading-ring loading-md"></div>-->
+      </div>`
+    }
+    html += `  
+    </div>
     <div class="text-lg font-bold py-8 px-4">Transactions</div>
     <div class="grid px-4 grid-cols-[minmax(0,_1fr)_auto_minmax(0,_1fr)_minmax(0,_1fr)_minmax(0,_1fr)]">
     <div class="font-semibold border-b-2 pl-2 border-slate-400">Date</div>

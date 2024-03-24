@@ -13,6 +13,10 @@ run both of these for development work:
 > npx tailwindcss -i ./input.css -o ./output.css --watch
 > npx http-server .
 
+Add these parameters to the url to test things:
+?restart
+?cheats
+
 Before release:
 Look up 'tailwind purge', configure tailwind to purge unused classes
 

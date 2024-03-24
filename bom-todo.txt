@@ -84,8 +84,13 @@ Transferring works. The page could use some polish though.
 
 [x] use thin-space separators to make large numbers easier to read.
 
-[ ] the game can be saved in local storage and restored
+[x] the game can be saved in local storage and restored
 [ ] there's a 'sign up page' at the beginning that sets the scene.
+
+That's probably the end of 'cabin week' development work.
+
+A new stage could trigger when you have 6000 in assets, or 10000 if i want it grindy.
+It actually held my interest to 38000 and beyond!
 
 [ ] add energy limits... limits how much you can transfer per minute.
     Error when a transfer fails.
@@ -98,9 +103,6 @@ Nice-to-have:
  - Live updates of the amount in each account? 
  - Show what the remaining balance will be after the transfer.
  - forbid transferring money from an account to itself
-
-A new stage could trigger when you have 6000 in assets, or 10000 if i want it grindy.
-It actually held my interest to 38000 and beyond!
 
 
 Abandoned:

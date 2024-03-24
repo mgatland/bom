@@ -1,8 +1,8 @@
 import { cash } from './util.js'
 
-const user = {}
-const state = {user, frame:0}
-window.cheats = true
+const SAVE_KEY = "bank_of_matthew_0.1"
+const state = {}
+window.cheats = false
 
 // API
 const server = {}
@@ -10,6 +10,7 @@ const server = {}
 {
   let client = null
   let serverTime = new Date()
+  let user = null
   
   const freeGiftText = `Collect welcome gift`
   
@@ -19,6 +20,9 @@ const server = {}
   
   
   function setupNewUser() {
+    state.frame = 0
+    state.user = {}
+    let user = state.user
     user.messages = []
     user.unclaimedGifts = []
     user.freeGiftNumber = 0
@@ -143,6 +147,10 @@ const server = {}
     client.toast(message)
   }
   
+  function save() {
+    window.localStorage.setItem(SAVE_KEY, JSON.stringify(state))
+  }
+
   function tick() {
     // catch up ticks if we fell behind
     const trueDate = new Date()
@@ -187,12 +195,43 @@ const server = {}
       delete user.events[state.frame]
       
     } while (serverTime.getTime() < trueDate.getTime() + 500)
+    save()
   }
   
   server.start = function (newClient) {
     if (client != null) error("attempt to start server more than once")
     client = newClient
-    setupNewUser();
+    const savedJson = window.localStorage.getItem(SAVE_KEY)
+
+    const queryString = window.location.search;
+    if (queryString === '?cheats') {
+      window.cheats = true
+    }
+    const freshStart = (queryString === '?restart' || window.cheats)
+
+    if (savedJson && !freshStart) {
+      // https://stackoverflow.com/a/14509447
+      const dateTimeReviver = function (key, value) {
+        let a
+        if (typeof value === 'string') {
+            //a = /\/Date\((\d*)\)\//.exec(value)
+            a = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/.exec(value)
+            if (a) {
+                return new Date(value);
+            }
+        }
+        return value;
+      }
+      const savedState = JSON.parse(savedJson, dateTimeReviver)
+      Object.assign(state, savedState)
+      console.log(state)
+      console.log('loaded save')
+    } else {
+      setupNewUser()
+      console.log(state)
+      console.log('starting a new game')
+    }
+    user = state.user
     setInterval(tick, 1000)
   }
   

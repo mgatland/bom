@@ -1,5 +1,8 @@
 import mCreateAccountPage from "./bom-create-account.js"
+import mTransferPage from "./bom-transfer.js"
 import mAccountPage from "./bom-account.js"
+import server from "./bom-server.js"
+import { cash } from './util.js'
 
 const $ = document.querySelector.bind(document)
 const camelToDashCase = str => str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
@@ -10,25 +13,29 @@ const messageListEl = $('.bom-message-list')
 const accountListEl = $('.bom-account-list')
 const deleteMessagesEl = $('.bom-delete-messages-button')
 const toastEl = $('.bom-toasts')
+const pagesEl = $('.bom-pages')
 
 const bankPages = []
 function addBankPage(name) {
-  bankPages[name] = $('.bom-page-' + camelToDashCase(name))
+  const tag = 'bom-page-' + camelToDashCase(name)
+  bankPages[name] = $('.' + tag)
 }
-['createAccount', 'accounts', 'messages', 'account'].map(addBankPage)
+['createAccount', 'accounts', 'messages', 'account', 'transfer'].map(addBankPage)
 
 const client = {}
 client.refresh = function (parts) {
   if (!parts) {
-    updateMessages()
-    updateAccounts()
+    refreshMessages()
+    refreshAccounts()
+    mAccountPage.refresh()
     return
   }
   if (parts.includes('messages')) {
-    updateMessages()
+    refreshMessages()
   }
   if (parts.includes('accountBalances')) {
-    updateAccountBalances()
+    refreshAccountBalances()
+    mAccountPage.refresh()
   }
 }
 
@@ -77,6 +84,12 @@ $('.bom-create-account-button').addEventListener('click', function (e) {
   showPage(bankPages.createAccount)
 })
 
+$('.bom-transfer-button').addEventListener('click', function (e) {
+  mTransferPage.show()
+  showPage(bankPages.transfer)
+  log('hi')
+})
+
 accountListEl.addEventListener('click', function(e) {
   const viewAccountEl = e.target.closest('.bom-view-account')
   if (viewAccountEl) {
@@ -106,7 +119,7 @@ function showPage(newPage) {
   Object.entries(bankPages).forEach(([, value]) => showPage(value))
 }
 
-function updateMessages() {
+function refreshMessages() {
   const messages = server.getMessages()
   const alertCount = server.getAlertCount()
   display(messageAlertEl, alertCount > 0)
@@ -138,7 +151,7 @@ function updateHtml(el, newHTML) {
   }
 }
 
-function updateAccountBalances() {
+function refreshAccountBalances() {
   //super hacks. Lots of duplicate and strongly coupled code with method below.
   const accounts = server.getAccounts()
   let n = 0
@@ -151,7 +164,7 @@ function updateAccountBalances() {
   }
 }
 
-function updateAccounts() {
+function refreshAccounts() {
   const accounts = server.getAccounts()
   let accountsHtml = ''
   let n = 0
@@ -183,10 +196,6 @@ function updateAccounts() {
   accountListEl.innerHTML = accountsHtml;
 }
 
-function cash(num) {
-  return Number(num).toFixed(2)
-}
-
 function log (...rest) {
   console.log(...rest)
 }
@@ -198,4 +207,5 @@ function capitalizeFirstLetter(string) {
 server.start(client)
 mCreateAccountPage.setup(bankPages.createAccount, server)
 mAccountPage.setup(bankPages.account, server)
+mTransferPage.setup(bankPages.transfer, server)
 showPage(bankPages.accounts)

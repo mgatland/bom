@@ -1,3 +1,5 @@
+import { cash } from './util.js'
+
 const user = {}
 const state = {user, frame:0}
 window.cheats = true
@@ -7,13 +9,15 @@ const server = {}
 
 {
   let client = null
-
+  let serverTime = new Date()
+  
   const freeGiftText = `Collect welcome gift`
-
-  function cash(num) {
-    return Number(num).toFixed(2)
+  
+  function getNow() {
+    return new Date(serverTime)
   }
-
+  
+  
   function setupNewUser() {
     user.messages = []
     user.unclaimedGifts = []
@@ -29,38 +33,40 @@ const server = {}
     user.emptyInboxTime = 4 // hack to more quickly trigger the welcome email
     user.events = {}
     if (window.cheats) {
-      giveMoney(300)
-      server.createAccount('term investment', 'Term Investment', 150, 0) 
+      setTimeout(x => {
+        giveMoney(1453567.32)
+        server.createAccount('term investment', 'Term Investment', 150, 0) 
+      }, 50)
     }
   }
-
+  
   function createWelcomeMessage() {
     user.freeGiftNumber++
     user.unclaimedGifts.push(user.freeGiftNumber)
     return {
       read: false,
-      date: new Date(),
+      date: getNow(),
       title: `A welcome gift for you!`,
       text: `Dear &lt;user_with_no_messages&gt;,<br><br>Welcome to Bank of Matthew, the new financial system that's Better than Bitcoin. As a thank you for joining us on this journey, we'd like to send you 100 Coins of Matthew as a welcome gift.`,
       action: {type:'freeGift', 
-        id:user.freeGiftNumber,
-        text:freeGiftText},
+      id:user.freeGiftNumber,
+      text:freeGiftText},
       id: `free-gift-${user.freeGiftNumber}`
     }
   }
-
+  
   server.MINIMUM_NEW_ACCOUNT_BALANCE = 150
-
+  
   server.getMessages = function () {
     return user.messages
   }
-
+  
   server.getAccounts = function () {
     return user.accounts
   }
-
+  
   server.getAlertCount = () => user.messages.filter(m => m.read === false).length
-
+  
   server.userAction = function (action, code) {
     if (action === 'freeGift') {
       const num = parseInt(code)
@@ -75,16 +81,16 @@ const server = {}
           +`<span class="loading loading-spinner absolute"></span>`
           message.read = true
         }
-        client.refresh()
+        client.refresh('messages')
       }
     }
   }
-
+  
   server.deleteMessages = function () {
     user.messages.length = 0
-    client.refresh()
+    client.refresh('messages')
   }
-
+  
   function addEvent(time, event) {
     if (time === 0) error("don't add events to current frame")
     const frame = state.frame + time
@@ -93,7 +99,7 @@ const server = {}
     }
     user.events[frame].push(event)
   }
-
+  
   function datesMatch(oldDate, newDate) {
     const cleanOld = new Date(oldDate)
     const cleanNew = new Date(newDate)
@@ -103,19 +109,20 @@ const server = {}
     cleanNew.setMilliseconds(0)
     return cleanOld.getTime() === cleanNew.getTime()
   }
-
+  
   function transaction(account, amount, message) {
     account.balance += amount
-
+    
     // special handling for rapidly repeated payments
-    const date = new Date();
+    const date = getNow()
     const lastTxn = account.txns.slice(-1)[0]
     if (lastTxn && lastTxn.amount === amount && lastTxn.message === message && datesMatch(lastTxn.date, date)) {
       lastTxn.date = date
-      lastTxn.multiplier = lastTxn.multiplier + 1 || 2 
+      lastTxn.multiplier = lastTxn.multiplier + 1 || 2
+      lastTxn.balance = account.balance 
       return
     }
-
+    
     account.txns.push({
       amount: amount,
       message: message,
@@ -124,64 +131,71 @@ const server = {}
       //multiplier
     })
   }
-
+  
   function giveMoney(amount) {
     const account = user.accounts[0]
     transaction(account, amount, 'BOM Welcome Gift')
     toast(`Your ${account.name} account balance is now $${cash(account.balance)}`)
   }
-
+  
   function toast(message) {
     //toasts are transient and not persisted
     client.toast(message)
   }
-
+  
   function tick() {
-    state.frame = (state.frame + 1 % (60 * 60))
-    let dirty = []
-    if (user.messages.length == 0) {
-      user.emptyInboxTime++
-      if (user.emptyInboxTime >= 5) {
-        user.messages.push(createWelcomeMessage())
-        user.emptyInboxTime = 0
-        dirty.push('messages')
-      }
-    }
-    for (const event of (user.events[state.frame] || [])) {
-      if (event.type === 'freeGiftRecieved') {
-        giveMoney(100)
-        const message = user.messages.find(x => x.id = 'free-gift-' + event.id)
-        if (message) {
-          message.action.text =
-          `<span style='color:rgba(0,0,0,0);'>${freeGiftText}</span>`  
-          +`<span class="absolute text-slate-600">Done! <i class="fa-solid fa-sack-dollar fa-xl"></i></span>`
-          message.action.type = 'disabled'
+    // catch up ticks if we fell behind
+    const trueDate = new Date()
+    do {
+      serverTime = new Date(getNow().getTime() + 1000)
+      state.frame = (state.frame + 1 % (60 * 60))
+      
+      let dirty = []
+      if (user.messages.length == 0) {
+        user.emptyInboxTime++
+        if (user.emptyInboxTime >= 5) {
+          user.messages.push(createWelcomeMessage())
+          user.emptyInboxTime = 0
+          dirty.push('messages')
         }
-        dirty.push('messages')
-        dirty.push('accountBalances')
       }
-    }
-    for (const account of user.accounts) {
-      if (account.type === 'term investment') {
-        const amount = Math.floor(100 * account.interestRate * account.balance) / 100
-        transaction(user.accounts[0], amount, 'Interest')
-        dirty.push('accountBalances')
+      for (const event of (user.events[state.frame] || [])) {
+        if (event.type === 'freeGiftRecieved') {
+          giveMoney(100)
+          const message = user.messages.find(x => x.id = 'free-gift-' + event.id)
+          if (message) {
+            message.action.text =
+            `<span style='color:rgba(0,0,0,0);'>${freeGiftText}</span>`  
+            +`<span class="absolute text-slate-600">Done! <i class="fa-solid fa-sack-dollar fa-xl"></i></span>`
+            message.action.type = 'disabled'
+          }
+          dirty.push('messages')
+          dirty.push('accountBalances')
+        }
       }
-    }
-
-    if (dirty.length > 0) {
-      client.refresh(dirty)
-    }
-    delete user.events[state.frame]
+      for (const account of user.accounts) {
+        if (account.type === 'term investment') {
+          const amount = Math.floor(100 * account.interestRate * account.balance) / 100
+          transaction(user.accounts[0], amount, 'Interest')
+          dirty.push('accountBalances')
+        }
+      }
+      
+      if (dirty.length > 0) {
+        client.refresh(dirty)
+      }
+      delete user.events[state.frame]
+      
+    } while (serverTime.getTime() < trueDate.getTime() + 500)
   }
-
+  
   server.start = function (newClient) {
     if (client != null) error("attempt to start server more than once")
     client = newClient
     setupNewUser();
     setInterval(tick, 1000)
   }
-
+  
   server.createAccount = function (accountType, accountName, startBalance, oldAccountIndex) {
     const oldAccount = user.accounts[oldAccountIndex]
     if (!oldAccount) {
@@ -203,7 +217,7 @@ const server = {}
       txns: []
     }
     if (newAccount.type === 'term investment') {
-      newAccount.endDate = new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+      newAccount.endDate = new Date(getNow().setFullYear(getNow().getFullYear() + 1))
       newAccount.interestRate = 0.01
     }
     user.accounts.push(newAccount)
@@ -212,4 +226,33 @@ const server = {}
     client.toast("New account created!")
     client.showAccounts()
   }
+
+  server.createTransfer = (amount, transferFrom, transferTo) => {
+    const fromAccount = user.accounts[transferFrom]
+    const toAccount = user.accounts[transferTo]
+    //todo: round amount to 2 decimal places
+    console.log(amount)
+    if (!fromAccount) {
+      client.toast(`Please select an account to transfer the amount from.`)
+      return
+    }
+    if (!toAccount) {
+      client.toast(`Please select an account to transfer the amount to.`)
+      return
+    }
+    if (amount <= 0) {
+      client.toast(`Please enter a valid amount of money to transfer.`)
+      return
+    }
+    if (fromAccount.balance < amount) {
+      client.toast(`The account ${fromAccount.name} does not have ${cash(amount)} available.`)
+      return
+    }
+    transaction(fromAccount, -amount, 'Transfer to ' + toAccount.name)
+    transaction(toAccount, amount, 'Transfer from ' + fromAccount.name)
+    client.toast(`$${cash(amount)} transferred to ${toAccount.name}`)
+    client.showAccounts()
+  }
 }
+
+export default server

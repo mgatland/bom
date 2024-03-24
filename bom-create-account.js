@@ -1,8 +1,7 @@
+import { cash } from './util.js'
+
 const mCreateAccountPage = {}
 
-function cash(num) {
-  return Number(num).toFixed(2)
-}
 
 const everyAccountDesc = `It's free to deposit and withdraw money from an Everyday account.`
 const termInvestmentAccountDesc = `

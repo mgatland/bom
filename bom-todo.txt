@@ -69,14 +69,21 @@ Final day!
 
 [x] Account pages have a summary of that account's details at the top.
 
-[ ] handle setInterval running less frequently in background tabs. Do a 'catch-up' process on the server.
-    have 'serverTime that increments by one second at a time.
+[x] handle setInterval running less frequently in background tabs. Do a 'catch-up' process on the server.
+    have 'serverTime' that increments by one second at a time.
 
-[ ] let players transfer money between accounts. It's not really useful but important to the bank fantasy.
+[x] account pages should have live updates :/ It doesn't feel right when they don't. This is going to be hacky.
+
+[x] let players transfer money between accounts. It's not really useful but important to the bank fantasy.
     - new 'transfer' page accessed from account specific page
     - could also have its own dedicated link
     - choose account to transfer from, account to transfer to, amount.
     - error handling and make it work.
+
+Transferring works. The page could use some polish though.
+
+[x] use thin-space separators to make large numbers easier to read.
+
 [ ] the game can be saved in local storage and restored
 [ ] there's a 'sign up page' at the beginning that sets the scene.
 
@@ -85,14 +92,22 @@ Final day!
     This sets up the 'part 2' of the game. Managing energy.
 
 Nice-to-have:
-[ ] add transaction history... and somehow manage the noise of too many interest payments
+[x] add transaction history... and somehow manage the noise of too many interest payments
 [ ] look at ASB screenshots on my phone from 2024-03-24. Nicer transaction history.
+[ ] polish the transfer page. 
+ - Live updates of the amount in each account? 
+ - Show what the remaining balance will be after the transfer.
+ - forbid transferring money from an account to itself
+
+A new stage could trigger when you have 6000 in assets, or 10000 if i want it grindy.
+It actually held my interest to 38000 and beyond!
+
 
 Abandoned:
+[ ] have a 'bottom of screen menu' with icon links to: accounts, transfers, messages
 [ ] When your total balance gets too high you get a message about tax.
     Tax is going to be our way of having exponentially increasing costs?
 [ ] the animation in a Term Investment should be 1 second long, not 1.8 seconds long, so it syncs with actual payments.
-[ ] your bank accounts have a transaction history 
 [ ] changelog - we fixed an issue where some users missed out on their welcome gift.
 [ ] maybe the 'real currency' is having messages in your inbox.
 [ ] restyle all buttons to be sharp rectangles with crisp outlines like Westpac has
@@ -105,7 +120,6 @@ new:
 
 buy funds and securities 
 put money in savings accounts or term investments
-
 
 from google keep:
 if you report a bug you get put on hold. The hold waiting position number gives you a secret code that's new every day 

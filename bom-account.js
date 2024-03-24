@@ -1,8 +1,13 @@
+import { cash } from './util.js'
+
 const mAccountPage = {}
 
-function cash(num) {
-  return Number(num).toFixed(2)
-}
+// cache for refresh hacks
+const cache = {
+  accountNum: null,
+  TxnCount: null,
+  lastTxnMultiplier: null
+} 
 
 function formatDateTime(d) {
   return ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) 
@@ -20,10 +25,17 @@ function mp(txn) {
 }
 
 mAccountPage.setup = function (basePage, server) { 
-  
+
+  function updateCache(account, accountNum) {
+    cache.accountNum = accountNum
+    cache.TxnCount = account.txns.length
+    cache.lastTxnMultiplier = account.txns.slice(-1)[0].multiplier
+  }
+
   mAccountPage.show = function(accountNum) {
     const account = server.getAccounts()[accountNum]
     const isTermInvestment = account.type === 'term investment'
+    updateCache(account, accountNum)
     const n = accountNum
     let html = `
     <div class="py-8 px-4 border-b-2"> 
@@ -58,11 +70,11 @@ mAccountPage.setup = function (basePage, server) {
       toggle = !toggle
       const style = toggle ? '' : 'bg-slate-100'
       html += `
-      <div class="pl-2 pr-2 py-4 ${style}">${formatDateTime(txn.date)}</div>
+      <div class="pl-2 pr-2 py-4 ${style} bom-txn-date">${formatDateTime(txn.date)}</div>
       <div class="pr-2 py-4 ${style}">${txn.message}</div>
-      <div class="pr-2 py-4 ${style}">${txn.amount < 0 ? '$' + cash(-txn.amount) + mp(txn) : ''}</div>
-      <div class="pr-2 py-4 ${style}">${txn.amount >= 0 ? '$' + cash(txn.amount) + mp(txn) : ''}</div>
-      <div class="pr-2 py-4 ${style}">$${cash(txn.balance)}</div>
+      <div class="pr-2 py-4 ${style} bom-txn-amount-out">${txn.amount < 0 ? '$' + cash(-txn.amount) + mp(txn) : ''}</div>
+      <div class="pr-2 py-4 ${style} bom-txn-amount-in">${txn.amount >= 0 ? '$' + cash(txn.amount) + mp(txn) : ''}</div>
+      <div class="pr-2 py-4 ${style} bom-txn-bal">$${cash(txn.balance)}</div>
       `
     }
     html += `</div>`
@@ -91,6 +103,29 @@ mAccountPage.setup = function (basePage, server) {
     </div>
     <div class="btn mx-4 mb-3 bom-create-account-button">Create Account</div>
     `
+  }
+
+  mAccountPage.refresh = function() {
+    if (cache.accountNum === null) return
+    const accountNum = cache.accountNum
+    // more hacks because I didn't use Vue... selectively refresh parts of the page if required.
+    // assumes that accounts can only be changed through adding txns or repeating the last txn
+    // assumes the last txn is the first displayed in html
+    const account = server.getAccounts()[accountNum]
+    const txn = account.txns.slice(-1)[0]
+    const lastTxnMultiplier = txn.multiplier
+    if (cache.TxnCount != account.txns.length) {
+      mAccountPage.show(cache.accountNum) // a new txn? just rebuild the whole thing then.
+    } else if (cache.lastTxnMultiplier != lastTxnMultiplier) {
+      // update the last txn and the balance
+      basePage.querySelector('.bom-acc-bal-' + accountNum).innerHTML = `$${cash(account.balance)}`
+      basePage.querySelector('.bom-txn-date').innerHTML = `${formatDateTime(txn.date)}`
+      basePage.querySelector('.bom-txn-amount-out').innerHTML = `${txn.amount < 0 ? '$' + cash(-txn.amount) + mp(txn) : ''}`
+      basePage.querySelector('.bom-txn-amount-in').innerHTML = `${txn.amount >= 0 ? '$' + cash(txn.amount) + mp(txn) : ''}`
+      basePage.querySelector('.bom-txn-bal').innerHTML = `$${cash(txn.balance)}`
+
+    }
+    updateCache(account, accountNum)
   }
 }
 

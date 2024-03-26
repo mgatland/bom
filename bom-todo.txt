@@ -85,6 +85,8 @@ Transferring works. The page could use some polish though.
 [x] use thin-space separators to make large numbers easier to read.
 
 [x] the game can be saved in local storage and restored
+
+[ ] I could save the client state / current subpage 
 [ ] there's a 'sign up page' at the beginning that sets the scene.
 
 That's probably the end of 'cabin week' development work.

@@ -236,6 +236,10 @@ const server = {}
   }
   
   server.createAccount = function (accountType, accountName, startBalance, oldAccountIndex) {
+    // fix data from client
+    startBalance = Number(startBalance)
+    oldAccountIndex = Number(oldAccountIndex)
+
     const oldAccount = user.accounts[oldAccountIndex]
     if (!oldAccount) {
       client.toast(`Please select an account to transfer the starting balance from.`)
@@ -267,6 +271,7 @@ const server = {}
   }
 
   server.createTransfer = (amount, transferFrom, transferTo) => {
+    amount = Number(amount)
     const fromAccount = user.accounts[transferFrom]
     const toAccount = user.accounts[transferTo]
     //todo: round amount to 2 decimal places
